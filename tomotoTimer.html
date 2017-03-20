@@ -1,0 +1,208 @@
+<html>
+<head>
+    <meta charset="utf-8" />
+    <script src="jquery-3.1.1.js"></script>
+    
+</head>
+<style>
+    input{
+        width:       120px;
+        text-align:  right;
+    }
+    .s1{
+        border-style: solid;
+        border-color: #ACD6FF;
+        border-width: 5px;
+        padding: 20px;
+        margin: 20px;
+    }
+    button{
+        margin: 0px 20px 0px 20px;
+    }
+</style>
+<body>
+<script>
+'use strict';
+var totalSecond = 0;
+var timer;
+var tomatoWorkTime = 25;
+var tomatoFreeTime = 5;
+var tomatoStatus = 0;//0--正常模式,1--番茄工作阶段，2--番茄休息阶段
+$(document).ready(function(){ 
+    $("#hourTxt").val("0"); 
+    $("#minTxt").val("25"); 
+    $("#sedTxt").val("0"); 
+    $("#tomatoWorkTime").val("25");
+    $("#tomatoFreeTime").val("5");
+}); 
+
+function startT(){
+    if (totalSecond > 0)
+        return;
+    totalSecond = parseInt($("#hourTxt").val())*3600 + 
+                parseInt($("#minTxt").val())*60+
+                parseInt($("#sedTxt").val());
+    console.log("totalSecond = "+totalSecond);
+    timer = setInterval(startTimer, 1000);
+}
+function startTimer(){
+    totalSecond--;
+    if (totalSecond > 0){
+      console.log("还剩"+totalSecond+"秒");
+      $("#labTimer").css('display','block'); 
+      $("#TimerSeter").css('display','none');
+      if (tomatoStatus === 0)
+      {
+        $("#labTimer").html("剩余 "+totalSecond+"秒");
+      }
+      else if (tomatoStatus === 1)
+      {
+        $("#labTimer").html("工作中,剩余"+totalSecond+"秒");
+      }
+      else if (tomatoStatus === 2)
+      {
+        $("#labTimer").html("休息中,剩余"+totalSecond+"秒");
+      }
+    }
+    else{
+      clearInterval(timer);  
+      if (tomatoStatus === 0)
+      {
+        console.log("结束");
+        alert("结束");
+        $("#labTimer").css('display','none');
+        $("#TimerSeter").css('display','block');
+      }
+      else if (tomatoStatus === 1)
+      {
+        console.log("工作结束");
+        alert("工作结束");
+        
+        startTomatoFree();
+      }
+      else if (tomatoStatus === 2)
+      {
+        console.log("休息结束");
+        alert("休息结束");
+
+        startTomatoWork();
+      }
+      
+    }
+}
+
+function clearT(){
+    console.log("结束");
+    clearInterval(timer);
+    totalSecond = 0;
+    $("#labTimer").css('display','none');
+    $("#TimerSeter").css('display','block');
+    tomatoStatus = 0;
+}
+
+function istomatoTimer(){
+    let val=$('input:radio[name="mode_choose"]:checked').val();
+    if (val === "1"){
+        clearT();
+        $("#tomatoDiv").css('display','none');
+    }
+    else{
+        $("#tomatoDiv").css('display','block');
+    }
+    console.log("当前选中了"+(val === "1"));
+}
+
+function confirmTomatoSet(){
+    tomatoWorkTime = $("#tomatoWorkTime").val();
+    tomatoFreeTime = $("#tomatoFreeTime").val();
+    console.log("tomatoWorkTime "+tomatoWorkTime);
+    console.log("tomatoFreeTime "+tomatoFreeTime);
+    
+    startTomatoWork();
+    
+}
+
+function resetTomatoSet(){
+    tomatoWorkTime = 1;
+    tomatoFreeTime = 1;
+    $("#tomatoWorkTime").val("1");
+    $("#tomatoFreeTime").val("1");
+    console.log("tomatoWorkTime "+tomatoWorkTime);
+    console.log("tomatoFreeTime "+tomatoFreeTime);
+    tomatoStatus = 0;
+    clearT();
+}
+
+function tomatoModeChoose(){
+    let val=$('input:radio[name="tomato_choose"]:checked').val();
+    if (val === "1"){
+        clearT();
+        $("#tomatoTimeSetDiv").css('display','none');
+        tomatoWorkTime = 25;
+        tomatoFreeTime = 5;
+        startTomatoWork();
+    }
+    else{
+        clearT();
+        $("#tomatoTimeSetDiv").css('display','block');
+    }
+    console.log("当前选中了"+(val === "1"));
+}
+
+function startTomatoWork(){
+    let hourWorkTomatoSet = parseInt(tomatoWorkTime/60);
+    let minWorkTomatoSet = tomatoWorkTime%60;
+    console.log("hourWorkTomatoSet "+hourWorkTomatoSet);
+    console.log("minWorkTomatoSet "+minWorkTomatoSet);
+    $("#hourTxt").val(hourWorkTomatoSet);
+    $("#minTxt").val(minWorkTomatoSet);
+    $("#sedTxt").val("0");
+    tomatoStatus = 1;
+    startT();
+}
+
+function startTomatoFree(){
+    let hourFreeTomatoSet = parseInt(tomatoFreeTime/60);
+    let minFreeTomatoSet = tomatoFreeTime%60;
+    console.log("hourFreeTomatoSet "+hourFreeTomatoSet);
+    console.log("minFreeTomatoSet "+minFreeTomatoSet);
+    $("#hourTxt").val(hourFreeTomatoSet);
+    $("#minTxt").val(minFreeTomatoSet);
+    $("#sedTxt").val("0");
+    tomatoStatus = 2;
+    startT();
+}
+
+</script>
+<div class="s1">
+    <p id="TimerSeter" align="center" style="display:block;"><input id="hourTxt" type="text">:<input id="minTxt" type="text">:<input id="sedTxt" type="text"></p>
+    <p align="center"><label id="labTimer" style="display:none;"></label></p>
+    <p align="center"><button onclick="startT()">开始</button><button onclick="clearT()">停止</button></p>
+</div>
+<div class="s1">
+    <p align="center">
+        <label><input type="radio" name="mode_choose" onclick="istomatoTimer()" value="1" checked>普通模式</label>
+        <label><input type="radio" name="mode_choose" onclick="istomatoTimer()" value="2">番茄工作模式</label>
+    </p>
+</div>
+<div id="tomatoDiv" class="s1" style="display:none;">
+    <div id="tomatoTimeSetDiv" class="s1" style="display:none;border-color: white;">
+        <p align="center">
+            <label>工作时间：</label>
+            <input id="tomatoWorkTime" type="text">
+            <label>分钟</label>
+        </p>
+        <p align="center">
+            <label>休息时间：</label>
+            <input id="tomatoFreeTime" type="text">
+            <label>分钟</label>
+        </p>
+    </div>
+    <p align="center">
+        <label><input type="radio" name="tomato_choose" onclick="tomatoModeChoose()" value="1" checked>经典模式</label>
+        <label><input type="radio" name="tomato_choose" onclick="tomatoModeChoose()" value="2">自定义模式</label>
+    </p>
+    <p align="center"><button onclick="confirmTomatoSet()">确认</button><button onclick="resetTomatoSet()">清空</button></p>
+</div>
+</body>
+</html>
