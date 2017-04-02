@@ -35,6 +35,34 @@ $(document).ready(function(){
     $("#tomatoWorkTime").val("25");
     $("#tomatoFreeTime").val("5");
 }); 
+function timerTxt(timelong){
+    let hour = parseInt(timelong/3600)
+    let min = parseInt((timelong % 3600)/60)
+    let second = timelong % 60
+    return ((hour)?(hour+"小时"):"")+((min)?(min+"分钟"):"")+((second)?(second+"秒"):"")
+}
+
+function timerDisplay(){
+    $("#labTimer").css('display','block'); 
+    $("#TimerSeter").css('display','none');
+    if (tomatoStatus === 0)
+    {
+    $("#labTimer").html("剩余"+timerTxt(totalSecond));
+    }
+    else if (tomatoStatus === 1)
+    {
+    $("#labTimer").html("工作中,剩余"+timerTxt(totalSecond));
+    }
+    else if (tomatoStatus === 2)
+    {
+    $("#labTimer").html("休息中,剩余"+timerTxt(totalSecond));
+    }
+}
+
+function timerGone(){
+    $("#labTimer").css('display','none');
+    $("#TimerSeter").css('display','block');
+}
 
 function startT(){
     if (totalSecond > 0)
@@ -42,6 +70,7 @@ function startT(){
     totalSecond = parseInt($("#hourTxt").val())*3600 + 
                 parseInt($("#minTxt").val())*60+
                 parseInt($("#sedTxt").val());
+    timerDisplay();            
     console.log("totalSecond = "+totalSecond);
     timer = setInterval(startTimer, 1000);
 }
@@ -49,20 +78,7 @@ function startTimer(){
     totalSecond--;
     if (totalSecond > 0){
       console.log("还剩"+totalSecond+"秒");
-      $("#labTimer").css('display','block'); 
-      $("#TimerSeter").css('display','none');
-      if (tomatoStatus === 0)
-      {
-        $("#labTimer").html("剩余 "+totalSecond+"秒");
-      }
-      else if (tomatoStatus === 1)
-      {
-        $("#labTimer").html("工作中,剩余"+totalSecond+"秒");
-      }
-      else if (tomatoStatus === 2)
-      {
-        $("#labTimer").html("休息中,剩余"+totalSecond+"秒");
-      }
+      timerDisplay();
     }
     else{
       clearInterval(timer);  
@@ -70,8 +86,7 @@ function startTimer(){
       {
         console.log("结束");
         alert("结束");
-        $("#labTimer").css('display','none');
-        $("#TimerSeter").css('display','block');
+        timerGone();
       }
       else if (tomatoStatus === 1)
       {
@@ -95,8 +110,7 @@ function clearT(){
     console.log("结束");
     clearInterval(timer);
     totalSecond = 0;
-    $("#labTimer").css('display','none');
-    $("#TimerSeter").css('display','block');
+    timerGone();
     tomatoStatus = 0;
 }
 
@@ -123,10 +137,10 @@ function confirmTomatoSet(){
 }
 
 function resetTomatoSet(){
-    tomatoWorkTime = 1;
-    tomatoFreeTime = 1;
-    $("#tomatoWorkTime").val("1");
-    $("#tomatoFreeTime").val("1");
+    tomatoWorkTime = 25;
+    tomatoFreeTime = 5;
+    $("#tomatoWorkTime").val("25");
+    $("#tomatoFreeTime").val("5");
     console.log("tomatoWorkTime "+tomatoWorkTime);
     console.log("tomatoFreeTime "+tomatoFreeTime);
     tomatoStatus = 0;
