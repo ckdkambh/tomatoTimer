@@ -27,7 +27,9 @@ var totalSecond = 0;
 var timer;
 var tomatoWorkTime = 25;
 var tomatoFreeTime = 5;
-var tomatoStatus = 0;//0--正常模式,1--番茄工作阶段，2--番茄休息阶段
+var timerStatus = 0;//0--关闭, 1--正常开始, 2--暂停
+var tomatoStatus = 0;//0--普通模式, 1--番茄工作阶段，2--番茄休息阶段
+
 $(document).ready(function(){ 
     $("#hourTxt").val("0"); 
     $("#minTxt").val("25"); 
@@ -45,17 +47,23 @@ function timerTxt(timelong){
 function timerDisplay(){
     $("#labTimer").css('display','block'); 
     $("#TimerSeter").css('display','none');
-    if (tomatoStatus === 0)
+    switch (tomatoStatus)
     {
-    $("#labTimer").html("剩余"+timerTxt(totalSecond));
-    }
-    else if (tomatoStatus === 1)
-    {
-    $("#labTimer").html("工作中,剩余"+timerTxt(totalSecond));
-    }
-    else if (tomatoStatus === 2)
-    {
-    $("#labTimer").html("休息中,剩余"+timerTxt(totalSecond));
+        case 0:
+        {
+            $("#labTimer").html("剩余"+timerTxt(totalSecond));
+            break;
+        }
+        case 1:
+        {
+            $("#labTimer").html("工作中,剩余"+timerTxt(totalSecond));
+            break;
+        }
+        case 2:
+        {
+            $("#labTimer").html("休息中,剩余"+timerTxt(totalSecond));
+            break;
+        }
     }
 }
 
@@ -65,14 +73,37 @@ function timerGone(){
 }
 
 function startT(){
-    if (totalSecond > 0)
-        return;
-    totalSecond = parseInt($("#hourTxt").val())*3600 + 
+    switch (timerStatus)
+    {
+        case 0:
+        {
+            totalSecond = parseInt($("#hourTxt").val())*3600 + 
                 parseInt($("#minTxt").val())*60+
                 parseInt($("#sedTxt").val());
-    timerDisplay();            
-    console.log("totalSecond = "+totalSecond);
-    timer = setInterval(startTimer, 1000);
+            timerDisplay();
+            $("#startBtn").text("暂停");            
+            console.log("totalSecond = "+totalSecond);
+            timer = setInterval(startTimer, 1000);
+            timerStatus = 1;
+            break;
+        }
+        case 1:
+        {
+            $("#startBtn").text("继续");
+            clearInterval(timer);
+            console.log("暂停");
+            timerStatus = 2;
+            break;
+        }
+        case 2:
+        {
+            $("#startBtn").text("暂停");
+            console.log("totalSecond = "+totalSecond);
+            timer = setInterval(startTimer, 1000);
+            timerStatus = 1;
+            break;
+        }
+    }
 }
 function startTimer(){
     totalSecond--;
@@ -81,37 +112,45 @@ function startTimer(){
       timerDisplay();
     }
     else{
-      clearInterval(timer);  
-      if (tomatoStatus === 0)
-      {
-        console.log("结束");
-        alert("结束");
-        timerGone();
-      }
-      else if (tomatoStatus === 1)
-      {
-        console.log("工作结束");
-        alert("工作结束");
-        
-        startTomatoFree();
-      }
-      else if (tomatoStatus === 2)
-      {
-        console.log("休息结束");
-        alert("休息结束");
+        clearInterval(timer);  
+        switch (tomatoStatus)
+        {
+            case 0:
+            {
+                console.log("结束");
+                alert("结束");
+                $("#startBtn").text("开始");
+                timerGone();
+                break;
+            }
+            case 1:
+            {
+                console.log("工作结束");
+                alert("工作结束");
+                
+                startTomatoFree();                
+                break;
+            }
+            case 2:
+            {
+                console.log("休息结束");
+                alert("休息结束");
 
-        startTomatoWork();
-      }
-      
+                startTomatoWork();
+                break;
+            }
+        }
     }
 }
 
 function clearT(){
     console.log("结束");
+    $("#startBtn").text("开始");
     clearInterval(timer);
     totalSecond = 0;
     timerGone();
     tomatoStatus = 0;
+    timerStatus = 0;
 }
 
 function istomatoTimer(){
@@ -119,9 +158,11 @@ function istomatoTimer(){
     if (val === "1"){
         clearT();
         $("#tomatoDiv").css('display','none');
+        tomatoStatus = 0;
     }
     else{
         $("#tomatoDiv").css('display','block');
+        tomatoStatus = 1;
     }
     console.log("当前选中了"+(val === "1"));
 }
@@ -160,10 +201,12 @@ function tomatoModeChoose(){
         clearT();
         $("#tomatoTimeSetDiv").css('display','block');
     }
+    tomatoStatus = 1;
     console.log("当前选中了"+(val === "1"));
 }
 
 function startTomatoWork(){
+    timerStatus = 0;
     let hourWorkTomatoSet = parseInt(tomatoWorkTime/60);
     let minWorkTomatoSet = tomatoWorkTime%60;
     console.log("hourWorkTomatoSet "+hourWorkTomatoSet);
@@ -176,6 +219,7 @@ function startTomatoWork(){
 }
 
 function startTomatoFree(){
+    timerStatus = 0;
     let hourFreeTomatoSet = parseInt(tomatoFreeTime/60);
     let minFreeTomatoSet = tomatoFreeTime%60;
     console.log("hourFreeTomatoSet "+hourFreeTomatoSet);
@@ -191,7 +235,7 @@ function startTomatoFree(){
 <div class="s1">
     <p id="TimerSeter" align="center" style="display:block;"><input id="hourTxt" type="text">:<input id="minTxt" type="text">:<input id="sedTxt" type="text"></p>
     <p align="center"><label id="labTimer" style="display:none;"></label></p>
-    <p align="center"><button onclick="startT()">开始</button><button onclick="clearT()">停止</button></p>
+    <p align="center"><button id="startBtn" onclick="startT()">开始</button><button onclick="clearT()">停止</button></p>
 </div>
 <div class="s1">
     <p align="center">
@@ -211,12 +255,12 @@ function startTomatoFree(){
             <input id="tomatoFreeTime" type="text">
             <label>分钟</label>
         </p>
+        <p align="center"><button onclick="confirmTomatoSet()">确认</button><button onclick="resetTomatoSet()">清空</button></p>
     </div>
     <p align="center">
         <label><input type="radio" name="tomato_choose" onclick="tomatoModeChoose()" value="1" checked>经典模式</label>
         <label><input type="radio" name="tomato_choose" onclick="tomatoModeChoose()" value="2">自定义模式</label>
     </p>
-    <p align="center"><button onclick="confirmTomatoSet()">确认</button><button onclick="resetTomatoSet()">清空</button></p>
 </div>
 </body>
 </html>
