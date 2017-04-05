@@ -2,7 +2,7 @@
 <head>
     <meta charset="utf-8" />
     <script src="jquery-3.1.1.js"></script>
-    
+
 </head>
 <style>
     input{
@@ -29,14 +29,14 @@ var tomatoWorkTime = 25;
 var tomatoFreeTime = 5;
 var timerStatus = 0;//0--关闭, 1--正常开始, 2--暂停
 var tomatoStatus = 0;//0--普通模式, 1--番茄工作阶段，2--番茄休息阶段
-
-$(document).ready(function(){ 
-    $("#hourTxt").val("0"); 
-    $("#minTxt").val("25"); 
-    $("#sedTxt").val("0"); 
+var tomatoCount = 0;
+$(document).ready(function(){
+    $("#hourTxt").val("0");
+    $("#minTxt").val("25");
+    $("#sedTxt").val("0");
     $("#tomatoWorkTime").val("25");
     $("#tomatoFreeTime").val("5");
-}); 
+});
 function timerTxt(timelong){
     let hour = parseInt(timelong/3600)
     let min = parseInt((timelong % 3600)/60)
@@ -45,7 +45,7 @@ function timerTxt(timelong){
 }
 
 function timerDisplay(){
-    $("#labTimer").css('display','block'); 
+    $("#labTimer").css('display','block');
     $("#TimerSeter").css('display','none');
     switch (tomatoStatus)
     {
@@ -77,11 +77,11 @@ function startT(){
     {
         case 0:
         {
-            totalSecond = parseInt($("#hourTxt").val())*3600 + 
+            totalSecond = parseInt($("#hourTxt").val())*3600 +
                 parseInt($("#minTxt").val())*60+
                 parseInt($("#sedTxt").val());
             timerDisplay();
-            $("#startBtn").text("暂停");            
+            $("#startBtn").text("暂停");
             console.log("totalSecond = "+totalSecond);
             timer = setInterval(startTimer, 1000);
             timerStatus = 1;
@@ -112,7 +112,7 @@ function startTimer(){
       timerDisplay();
     }
     else{
-        clearInterval(timer);  
+        clearInterval(timer);
         switch (tomatoStatus)
         {
             case 0:
@@ -127,8 +127,9 @@ function startTimer(){
             {
                 console.log("工作结束");
                 alert("工作结束");
-                
-                startTomatoFree();                
+                tomatoCount++;
+                $("#tomatoCount").text("今日已完成"+tomatoCount+"个番茄");
+                startTomatoFree();
                 break;
             }
             case 2:
@@ -172,9 +173,9 @@ function confirmTomatoSet(){
     tomatoFreeTime = $("#tomatoFreeTime").val();
     console.log("tomatoWorkTime "+tomatoWorkTime);
     console.log("tomatoFreeTime "+tomatoFreeTime);
-    
+
     startTomatoWork();
-    
+
 }
 
 function resetTomatoSet(){
@@ -244,6 +245,7 @@ function startTomatoFree(){
     </p>
 </div>
 <div id="tomatoDiv" class="s1" style="display:none;">
+    <p align="center"><label id="tomatoCount" >今日已完成0个番茄</label></p>
     <div id="tomatoTimeSetDiv" class="s1" style="display:none;border-color: white;">
         <p align="center">
             <label>工作时间：</label>
