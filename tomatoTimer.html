@@ -37,6 +37,13 @@ $(document).ready(function(){
     $("#tomatoWorkTime").val("25");
     $("#tomatoFreeTime").val("5");
 });
+
+$(document).keydown(function(event){
+    if(event.keyCode == '13'){
+        $('#startT').click();
+    }
+}); 
+
 function timerTxt(timelong){
     let hour = parseInt(timelong/3600)
     let min = parseInt((timelong % 3600)/60)
