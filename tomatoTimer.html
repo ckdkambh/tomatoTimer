@@ -19,6 +19,10 @@
     button{
         margin: 0px 20px 0px 20px;
     }
+    .small_button{
+        width: 5px;
+        text-align: center;
+    }
 </style>
 <body>
 <script>
@@ -30,6 +34,9 @@ var tomatoFreeTime = 5;
 var timerStatus = 0;//0--关闭, 1--正常开始, 2--暂停
 var tomatoStatus = 0;//0--普通模式, 1--番茄工作阶段，2--番茄休息阶段
 var tomatoCount = 0;
+var isRepeat = false;
+var keyProtectTimerLength = 0;
+var keyProtectTimer;
 $(document).ready(function(){
     $("#hourTxt").val("0");
     $("#minTxt").val("25");
@@ -39,10 +46,28 @@ $(document).ready(function(){
 });
 
 $(document).keydown(function(event){
-    if(event.keyCode == '13'){
-        startT();
+    console.log(event.keyCode);
+    if(event.keyCode === 13){
+         console.log("keyProtectTimerLength "+keyProtectTimerLength);
+        if (0 === keyProtectTimerLength)
+        {
+            startProtectT();
+            startT();
+            keyProtectTimerLength = 5;
+        }
     }
 }); 
+
+function setStartBtnString(text){
+    $("#startBtn").text(text);
+    if (text === "继续")
+    {
+        $("#startBtn").css("background-color","red");
+    }
+    else{
+        $("#startBtn").css("background-color","#DDDDDD");
+    }
+}
 
 function timerTxt(timelong){
     let hour = parseInt(timelong/3600)
@@ -79,7 +104,23 @@ function timerGone(){
     $("#TimerSeter").css('display','block');
 }
 
+function startProtectT()
+{
+    keyProtectTimer = setInterval(protectTimer, 1000);
+}
+function protectTimer()
+{
+    keyProtectTimerLength--;
+    if (keyProtectTimerLength > 0){
+        
+    }
+    else{
+        clearInterval(keyProtectTimer);
+    }
+}
+
 function startT(){
+    console.log("ENTER startT()");
     switch (timerStatus)
     {
         case 0:
@@ -88,7 +129,7 @@ function startT(){
                 parseInt($("#minTxt").val())*60+
                 parseInt($("#sedTxt").val());
             timerDisplay();
-            $("#startBtn").text("暂停");
+            setStartBtnString("暂停");
             console.log("totalSecond = "+totalSecond);
             timer = setInterval(startTimer, 1000);
             timerStatus = 1;
@@ -96,7 +137,7 @@ function startT(){
         }
         case 1:
         {
-            $("#startBtn").text("继续");
+            setStartBtnString("继续");
             clearInterval(timer);
             console.log("暂停");
             timerStatus = 2;
@@ -104,7 +145,7 @@ function startT(){
         }
         case 2:
         {
-            $("#startBtn").text("暂停");
+            setStartBtnString("暂停");
             console.log("totalSecond = "+totalSecond);
             timer = setInterval(startTimer, 1000);
             timerStatus = 1;
@@ -126,9 +167,13 @@ function startTimer(){
             {
                 console.log("结束");
                 alert("结束");
-                $("#startBtn").text("开始");
+                setStartBtnString("开始");
                 timerGone();
                 timerStatus = 0;
+                if (1 === isRepeat)
+                {
+                    startT();
+                }
                 break;
             }
             case 1:
@@ -154,7 +199,7 @@ function startTimer(){
 
 function clearT(){
     console.log("结束");
-    $("#startBtn").text("开始");
+    setStartBtnString("开始");
     clearInterval(timer);
     totalSecond = 0;
     timerGone();
@@ -240,11 +285,33 @@ function startTomatoFree(){
     startT();
 }
 
+function minBtn(obj){
+    console.log(obj.name)
+}
+
+function isRepeatTimer(){
+    let val=$('input:radio[name="repeat_choose"]:checked').val();
+    if (val === "1"){
+        isRepeat = 0;
+        keyProtectTimerLength = 0;
+    }
+    else{
+        isRepeat = 1;
+        keyProtectTimerLength = 5;
+    }
+    console.log("当前选中了"+(val === "1"));
+}
 </script>
 <div class="s1">
     <p id="TimerSeter" align="center" style="display:block;"><input id="hourTxt" type="text">:<input id="minTxt" type="text">:<input id="sedTxt" type="text"></p>
     <p align="center"><label id="labTimer" style="display:none;"></label></p>
     <p align="center"><button id="startBtn" onclick="startT()">开始</button><button onclick="clearT()">停止</button></p>
+</div>
+<div class="s1">
+    <p align="center">
+        <label><input type="radio" name="repeat_choose" onclick="isRepeatTimer()" value="1" checked>单次定时器</label>
+        <label><input type="radio" name="repeat_choose" onclick="isRepeatTimer()" value="2">周期定时器</label>
+    </p>
 </div>
 <div class="s1">
     <p align="center">
@@ -271,6 +338,14 @@ function startTomatoFree(){
         <label><input type="radio" name="tomato_choose" onclick="tomatoModeChoose()" value="1" checked>经典模式</label>
         <label><input type="radio" name="tomato_choose" onclick="tomatoModeChoose()" value="2">自定义模式</label>
     </p>
+</div>
+<div id="tomatoResult" class="s1">
+    <p align="center">已完成且未分配番茄<label id="unallocated_tomato">0</label>个</p>
+    <div style="display: block;font-size: 0px;">
+        <input id="min1" name="min1" type="button" value="-" onclick="minBtn(this)"class="small_button"/>
+        <label id="text_box" name="text_box1" style="width: 50px;font-size: 5px;">0</label>
+        <input id="add1" name="add1" type="button" value="+" class="small_button"/>
+    </div>
 </div>
 </body>
 </html>
