@@ -1,74 +1,86 @@
+<!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8" />
     <script src="jquery-3.1.1.js"></script>
     <script src="tomatoTimer.js"></script>
+    <style>
+        input {
+            width: 120px;
+            text-align: right;
+        }
+
+        .s1 {
+            border-style: solid;
+            border-color: #ACD6FF;
+            border-width: 5px;
+            padding: 20px;
+            margin: 20px;
+        }
+
+        button {
+            margin: 0px 20px 0px 20px;
+        }
+
+        .small_button {
+            width: 5px;
+            text-align: center;
+        }
+    </style>
 </head>
-<style>
-    input{
-        width:       120px;
-        text-align:  right;
-    }
-    .s1{
-        border-style: solid;
-        border-color: #ACD6FF;
-        border-width: 5px;
-        padding: 20px;
-        margin: 20px;
-    }
-    button{
-        margin: 0px 20px 0px 20px;
-    }
-    .small_button{
-        width: 5px;
-        text-align: center;
-    }
-</style>
+
 <body>
-<div class="s1">
-    <p id="TimerSeter" align="center" style="display:block;"><input id="hourTxt" type="text">:<input id="minTxt" type="text">:<input id="sedTxt" type="text"></p>
-    <p align="center"><label id="labTimer" style="display:none;"></label></p>
-    <p align="center"><button id="startBtn" onclick="startT()">开始</button><button onclick="clearT()">停止</button></p>
-</div>
-<div class="s1">
-    <p align="center">
-        <label><input type="radio" name="repeat_choose" onclick="isRepeatTimer()" value="1" checked>单次定时器</label>
-        <label><input type="radio" name="repeat_choose" onclick="isRepeatTimer()" value="2">周期定时器</label>
-    </p>
-</div>
-<div class="s1">
-    <p align="center">
-        <label><input type="radio" name="mode_choose" onclick="istomatoTimer()" value="1" checked>普通模式</label>
-        <label><input type="radio" name="mode_choose" onclick="istomatoTimer()" value="2">番茄工作模式</label>
-    </p>
-</div>
-<div id="tomatoDiv" class="s1" style="display:none;">
-    <p align="center"><label id="tomatoCount" >今日已完成0个番茄</label></p>
-    <div id="tomatoTimeSetDiv" class="s1" style="display:none;border-color: white;">
-        <p align="center">
-            <label>工作时间：</label>
-            <input id="tomatoWorkTime" type="text">
-            <label>分钟</label>
-        </p>
-        <p align="center">
-            <label>休息时间：</label>
-            <input id="tomatoFreeTime" type="text">
-            <label>分钟</label>
-        </p>
-        <p align="center"><button onclick="confirmTomatoSet()">确认</button><button onclick="resetTomatoSet()">清空</button></p>
+    <div class="s1">
+        <p id="TimerSeter" align="center" style="display:block;"><input id="hourTxt" type="text">:<input id="minTxt" type="text">:<input id="sedTxt" type="text"></p>
+        <p align="center"><label id="labTimer" style="display:none;"></label></p>
+        <p align="center"><button id="startBtn" onclick="startT()">开始</button><button onclick="clearT()">停止</button></p>
     </div>
-    <p align="center">
-        <label><input type="radio" name="tomato_choose" onclick="tomatoModeChoose()" value="1" checked>经典模式</label>
-        <label><input type="radio" name="tomato_choose" onclick="tomatoModeChoose()" value="2">自定义模式</label>
-    </p>
-</div>
-<div id="tomatoResult" class="s1">
-    <p align="center">已完成且未分配番茄<label id="unallocated_tomato">0</label>个</p>
-    <div style="display: block;font-size: 0px;">
-        <input id="min1" name="min1" type="button" value="-" onclick="minBtn(this)"class="small_button"/>
-        <label id="text_box" name="text_box1" style="width: 50px;font-size: 5px;">0</label>
-        <input id="add1" name="add1" type="button" value="+" class="small_button"/>
+    <div class="s1">
+        <p align="center">
+            <label><input type="radio" name="repeat_choose" onclick="isRepeatTimer()" value="1" checked>单次定时器</label>
+            <label><input type="radio" name="repeat_choose" onclick="isRepeatTimer()" value="2">周期定时器</label>
+        </p>
     </div>
-</div>
+    <div class="s1">
+        <p align="center">
+            <label><input type="radio" name="mode_choose" onclick="istomatoTimer()" value="1" checked>普通模式</label>
+            <label><input type="radio" name="mode_choose" onclick="istomatoTimer()" value="2">番茄工作模式</label>
+        </p>
+    </div>
+    <div id="tomatoDiv" class="s1" style="display:none;">
+        <p align="center"><label id="tomatoCount">今日已完成0个番茄</label></p>
+        <div id="tomatoTimeSetDiv" class="s1" style="display:none;border-color: white;">
+            <p align="center">
+                <label>工作时间：</label>
+                <input id="tomatoWorkTime" type="text">
+                <label>分钟</label>
+            </p>
+            <p align="center">
+                <label>休息时间：</label>
+                <input id="tomatoFreeTime" type="text">
+                <label>分钟</label>
+            </p>
+            <p align="center"><button onclick="confirmTomatoSet()">确认</button><button onclick="resetTomatoSet()">清空</button></p>
+        </div>
+        <p align="center">
+            <label><input type="radio" name="tomato_choose" onclick="tomatoModeChoose()" value="1" checked>经典模式</label>
+            <label><input type="radio" name="tomato_choose" onclick="tomatoModeChoose()" value="2">自定义模式</label>
+        </p>
+    </div>
+    <div id="tomatoResult" class="s1" style="display:none;">
+        <p align="center">已完成且未分配番茄<label id="unallocated_tomato">0</label>个</p>
+        <div style="display: block;font-size: 0px;display:none;">
+            <input id="min1" name="min1" type="button" value="-" onclick="minBtn(this)" class="small_button" />
+            <label id="text_box" name="text_box1" style="width: 50px;font-size: 5px;">0</label>
+            <input id="add1" name="add1" type="button" value="+" class="small_button" />
+        </div>
+    </div>
+    <div class="s1">
+        <p align="center"><button id="getHistoryBtn" onclick="getHistory()">查看历史</button></p>
+        <div id="history" style="display:none;">
+        </div>
+    </div>
 </body>
+
 </html>
